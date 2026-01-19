@@ -2,7 +2,7 @@
 
 namespace Domain.Entities;
 
-public class Courses
+public class Courses : BaseEntities
 {
     [StringLength(30,MinimumLength = 3,ErrorMessage = "Title must be between 3 and 30 characters")]
     public string Title {  get; set; }

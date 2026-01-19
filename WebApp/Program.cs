@@ -1,9 +1,18 @@
+using Infrastructure.Data;
+using Infrastructure.Interfaces;
+using Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<ApplicationDataContext>(options => 
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString")) );
+builder.Services.AddScoped<ApplicationDataContext>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 var app = builder.Build();
 

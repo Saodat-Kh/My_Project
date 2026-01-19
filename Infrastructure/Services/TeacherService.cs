@@ -101,6 +101,7 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
 
     public Response<GetTeacherDto> GetTeacherSearchByName(string name)
     {
-         var res = context.Teachers.FirstOrDefault(x=> )
+        throw new NotImplementedException();
+         //var res = context.Teachers.FirstOrDefault(x=> )
     }
 }
