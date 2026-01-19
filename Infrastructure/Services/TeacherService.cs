@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Domain.Dto.Courses;
 using Domain.Dto.Teachers;
 using Domain.Entities;
 using Domain.Responses;
@@ -18,7 +19,9 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Email = dto.Email,
-            Phone = dto.Phone
+            Phone = dto.Phone,
+            ExperienceYears = dto.ExperienceYears,
+            Specialization = dto.Specialization
         };
         context.Teachers.Add(newTeacher);
         var res = context.SaveChanges();
@@ -32,12 +35,12 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
         var res = context.Teachers.FirstOrDefault(t => t.Id == id);
         if (res == null)
             return new Response<string>(HttpStatusCode.NotFound, "Teacher not found");
-        res.FirstName = dto.FirstName;
-        res.LastName = dto.LastName;
-        res.Email = dto.Email;
-        res.Phone = dto.Phone;
-        res.Specialization = dto.Specialization;
-        res.ExperienceYears = dto.ExperienceYears ?? 0;
+        res.FirstName = dto.FirstName!;
+        res.LastName = dto.LastName!;
+        res.Email = dto.Email!;
+        res.Phone = dto.Phone!;
+        res.Specialization = dto.Specialization!;
+        res.ExperienceYears = dto.ExperienceYears ?? res.ExperienceYears;
         var rew = context.SaveChanges();
         return rew > 0
             ? new Response<string>(HttpStatusCode.OK, "Teacher updated successfully")
@@ -46,7 +49,9 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
 
     public Response<string> DeleteTeacher(int id)
     {
-        var res = context.Teachers.FirstOrDefault(t => t.Id == id);
+        var res = context.Teachers.FirstOrDefault(t => t.Id == id && t.IsDeleted == false);
+        if(res == null)
+            return new Response<string>(HttpStatusCode.NotFound, "Teacher not  found");
         res.IsDeleted = true;
         res.DeletedAt = DateTime.UtcNow;
         var rew = context.SaveChanges();
@@ -66,7 +71,9 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
             LastName = z.LastName,
             Email = z.Email,
             Phone = z.Phone,
-            Specialization = z.Specialization
+            Specialization = z.Specialization,
+            ExperienceYears = z.ExperienceYears,
+            CreatedAt = z.CreatedAt
         }).ToList();
         if (dto.Count > 0)
             return new Response<List<GetTeacherDto>>(dto);
@@ -95,13 +102,41 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
 
     public Response<List<GetTeacherWithCourse>> GetAllTeachersWithCoursesIsActive()
     {
-        throw new NotImplementedException();
-       // var res = context.Teachers.Where(x => x.IsDeleted == false && x.IsActive  == true).Include(z=>z.Courses).ToList();
+        var res = context.Teachers.Where(x => x.IsDeleted ).Include(z=>z.Courses).ToList();
+        var rew = res.Select(z => new GetTeacherWithCourse()
+        {
+            FirstName = z.FirstName,
+            LastName = z.LastName,
+            Email = z.Email,
+            Phone = z.Phone,
+            ExperienceYears = z.ExperienceYears,
+            Specialization = z.Specialization,
+            Courses = z.Courses.Where(x=>x.IsActive).Select(c => new GetCourseDto()
+            {
+                Title = c.Title,
+                Id = c.Id,
+                Description = c.Description,
+                CreatedAt = c.CreatedAt
+            }).ToList()
+        }).ToList();
+        return new Response<List<GetTeacherWithCourse>>(rew);
+
     }
 
     public Response<GetTeacherDto> GetTeacherSearchByName(string name)
     {
-        throw new NotImplementedException();
-         //var res = context.Teachers.FirstOrDefault(x=> )
+        var res = context.Teachers.FirstOrDefault(x => x.FirstName == name && x.IsDeleted == false);
+        if (res == null)
+            return new Response<GetTeacherDto>(HttpStatusCode.NotFound, "Такого имени нет!");
+        var dto = new GetTeacherDto()
+        {
+            FirstName = res.FirstName,
+            LastName = res.LastName,
+            Email = res.Email,
+            Phone = res.Phone,
+            Specialization = res.Specialization,
+            ExperienceYears = res.ExperienceYears,
+        };
+        return new Response<GetTeacherDto>(dto);
     }
 }

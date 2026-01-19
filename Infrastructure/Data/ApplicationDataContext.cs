@@ -7,4 +7,5 @@ public class ApplicationDataContext(DbContextOptions<ApplicationDataContext> opt
 {
     public DbSet<Teachers>  Teachers { get; set; }
     public DbSet<Courses>  Courses { get; set; }
+    public DbSet<Groups>  Groups { get; set; }
 }
