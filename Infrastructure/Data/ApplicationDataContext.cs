@@ -8,4 +8,6 @@ public class ApplicationDataContext(DbContextOptions<ApplicationDataContext> opt
     public DbSet<Teachers>  Teachers { get; set; }
     public DbSet<Courses>  Courses { get; set; }
     public DbSet<Groups>  Groups { get; set; }
+    public DbSet<Student> Students { get; set; }
+    public DbSet<StudentGroups> StudentGroups { get; set; }
 }

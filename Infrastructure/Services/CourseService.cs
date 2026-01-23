@@ -13,18 +13,27 @@ public class CourseService(ApplicationDataContext context) : ICourseService
 {
     public Response<string> CreateCourses(CreateCourseDto dto)
     {
-        var newCourse = new Courses()
+        try
         {
-            Title = dto.Title,
-            Description = dto.Description,
-            Price = dto.Price,
-        };
-        context.Courses.Add(newCourse);
-        var res = context.SaveChanges();
-        return res > 0
-            ? new Response<string>(HttpStatusCode.Created, "Course created successfully")
-            : new Response<string>(HttpStatusCode.BadRequest, "Course creation failed");
-    }
+            var newCourse = new Courses()
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Price = dto.Price,
+            };
+            context.Courses.Add(newCourse);
+            var res = context.SaveChanges();
+            return res > 0
+                ? new Response<string>(HttpStatusCode.Created, "Course created successfully")
+                : new Response<string>(HttpStatusCode.BadRequest, "Course creation failed");
+
+        }
+        catch 
+        {
+            return new Response<string>(HttpStatusCode.InternalServerError, " Internal Server Error");
+        }
+        
+   }
 
     public Response<string> UpdateCourses(int id, UpdateCourseDto dto)
     {

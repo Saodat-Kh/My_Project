@@ -66,7 +66,7 @@ public class TeacherService(ApplicationDataContext context) : ITeacherService
         var res = context.Teachers.Where(x=>x.IsDeleted == false).ToList();
         var dto = res.Select(z => new GetTeacherDto()
         {
-            Id = z.Id,
+             Id = z.Id,
             FirstName = z.FirstName,
             LastName = z.LastName,
             Email = z.Email,
